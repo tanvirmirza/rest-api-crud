@@ -1,42 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../RestAPI/product_model.dart';
 import '../Style/style.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
-  final String netImg;
-  final String prodName;
-  final int prodQty;
-  final int prodPrice;
+  final Data data;
 
-  const ProductDetailsScreen(
-      {required this.netImg,
-      required this.prodName,
-      required this.prodQty,
-      required this.prodPrice,
-      super.key});
+
+  const ProductDetailsScreen({
+    required this.data,
+
+    super.key,
+  });
 
   @override
   State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
 }
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
-  String get netImg => widget.netImg;
-  String get prodName => widget.prodName;
-  int get prodQty => widget.prodQty;
-  int get prodPrice => widget.prodPrice;
+  Data get data => widget.data;
 
   late double regularPrice;
   int discount = 10;
 
   @override
   void initState() {
-    regularPrice = (prodPrice + (discount * prodPrice / 100)).roundToDouble();
+    regularPrice = (data.unitPrice! + (discount * data.unitPrice! / 100)).roundToDouble();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       backgroundColor: bodyBackground,
       appBar: AppBar(
@@ -45,7 +39,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           iconSize: 35,
           color: colorGrey,
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushReplacementNamed(context, '/homeScreen');
           },
         ),
         backgroundColor: bodyBackground,
@@ -60,7 +54,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           IconButton(
             icon: shopCart,
             color: colorGrey,
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, '/cartScreen');
+            },
           ),
         ],
       ),
@@ -73,7 +69,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Image.network(
-                  netImg,
+                  data.img.toString(),
                   fit: BoxFit.fill,
                 ),
               ),
@@ -81,113 +77,119 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 height: 10,
               ),
               Text(
-                ('$prodName '),
+                (data.productName.toString()),
                 style: GoogleFonts.lexend(
                     fontSize: 30, fontWeight: FontWeight.w600),
               ),
               const SizedBox(
                 height: 10,
               ),
-             if (prodQty != 0) Row(
-                children: [
-                  const SizedBox(
-                    width: 10,
-                  ),
-                   Container(
-                    height: 24,
-                    width: 70,
-                    decoration: discountBoxDecoration(),
-                    child: Center(
-                      child: RichText(
-                        text: TextSpan(
-                            text: '$discount%',
-                            style: GoogleFonts.lexend(
-                              color: colorWhite,
-                              fontSize: 18,
-                            ),
-                            children: [
-                              TextSpan(
-                                text: ' OFF',
-                                style: GoogleFonts.lexend(
-                                  color: colorWhite,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12,
-                                ),
-                              )
-                            ]),
+              if (data.qty != 0)
+                Row(
+                  children: [
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Container(
+                      height: 24,
+                      width: 70,
+                      decoration: discountBoxDecoration(),
+                      child: Center(
+                        child: RichText(
+                          text: TextSpan(
+                              text: '$discount%',
+                              style: GoogleFonts.lexend(
+                                color: colorWhite,
+                                fontSize: 18,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: ' OFF',
+                                  style: GoogleFonts.lexend(
+                                    color: colorWhite,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12,
+                                  ),
+                                )
+                              ]),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    '৳${regularPrice.toString()}',
-                    style: GoogleFonts.lexend(
-                        fontSize: 21,
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      '৳${regularPrice.toString()}',
+                      style: GoogleFonts.lexend(
+                          fontSize: 21,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey.shade700,
+                          decorationColor: Colors.grey.shade900,
+                          wordSpacing: 15,
+                          decoration: TextDecoration.lineThrough),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Text(
+                      '৳${data.unitPrice}',
+                      style: GoogleFonts.lexend(
+                        fontSize: 23,
                         fontWeight: FontWeight.w600,
-                        color: Colors.grey.shade700,
-                        decorationColor: Colors.grey.shade900,
                         wordSpacing: 15,
-                        decoration: TextDecoration.lineThrough),
+                      ),
+                    )
+                  ],
+                )
+              else
+                Text(
+                  '৳${data.unitPrice}',
+                  style: GoogleFonts.lexend(
+                    fontSize: 23,
+                    fontWeight: FontWeight.w600,
+                    wordSpacing: 15,
                   ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  Text(
-                    '৳$prodPrice',
-                    style: GoogleFonts.lexend(
-                      fontSize: 23,
-                      fontWeight: FontWeight.w600,
-                      wordSpacing: 15,
-                    ),
-                  )
-                ],
-              ) else Text(
-                    '৳$prodPrice',
-                    style: GoogleFonts.lexend(
-                      fontSize: 23,
-                      fontWeight: FontWeight.w600,
-                      wordSpacing: 15,
-                    ),
-                  ),
+                ),
               const SizedBox(
                 height: 10,
               ),
-              if (prodQty != 0) Row(
-                      children: [
-                        const Icon(
-                          Icons.check_circle,
-                          color: colorGreen,
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          'In Stock',
-                          style: GoogleFonts.poppins(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: colorGreen),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          '(available $prodQty pcs)',
-                          style: GoogleFonts.poppins(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        )
-                      ],
-                    ) else Text(
-                      'Out Of Stock',
+              if (data.qty != 0)
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.check_circle,
+                      color: colorGreen,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      'In Stock',
                       style: GoogleFonts.poppins(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
-                          color: colorRed),
+                          color: colorGreen),
                     ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      '(available ${data.qty} pcs)',
+                      style: GoogleFonts.poppins(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    )
+                  ],
+                )
+              else
+                Text(
+                  'Out Of Stock',
+                  style: GoogleFonts.poppins(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: colorRed),
+                ),
               const SizedBox(
                 height: 20,
               ),

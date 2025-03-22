@@ -1,26 +1,22 @@
 import 'package:api_crud_app/Widgets/secondary_button.dart';
 import 'package:flutter/material.dart';
 
+import '../RestAPI/product_model.dart';
 import '../RestAPI/rest_api_client.dart';
 import '../Style/style.dart';
 import '../Widgets/app_button.dart';
 import '../Widgets/product_textfield.dart';
 
 class ProductUpdateScreen extends StatefulWidget {
+  final Data data;
   final String? id;
-  final String? name;
-  final int? qty;
-  final String? img;
-  final int? unitPrice;
-  final int? totalPrice;
+
 
   const ProductUpdateScreen(
-      {this.id,
-      this.name,
-      this.qty,
-      this.img,
-      this.unitPrice,
-      this.totalPrice,
+      {
+        required this.data,
+        this.id,
+
       super.key});
 
   @override
@@ -29,6 +25,9 @@ class ProductUpdateScreen extends StatefulWidget {
 
 class _ProductUpdateScreenState extends State<ProductUpdateScreen> {
   final ProductController productController = ProductController();
+  Data get data => widget.data;
+
+
 
   late TextEditingController prodNameController;
   late TextEditingController prodQuantityController;
@@ -44,9 +43,9 @@ class _ProductUpdateScreenState extends State<ProductUpdateScreen> {
           int.tryParse(prodQuantityController.text) != null &&
           int.tryParse(prodUnitPriceController.text) != null &&
           int.tryParse(prodTotalPriceController.text) != null) {
-        if (widget.id != null) {
+        if (data.sId != null) {
           await productController.updateProduct(
-            widget.id!,
+            data.sId!,
             prodNameController.text,
             prodImageController.text,
             int.parse(prodQuantityController.text),
@@ -63,14 +62,15 @@ class _ProductUpdateScreenState extends State<ProductUpdateScreen> {
   @override
   void initState() {
     super.initState();
-    prodNameController = TextEditingController(text: widget.name ?? '');
+    prodImageController = TextEditingController(text: data.img ?? '');
+    prodNameController = TextEditingController(text: data.productName ?? '');
     prodQuantityController =
-        TextEditingController(text: widget.qty?.toString() ?? '');
-    prodImageController = TextEditingController(text: widget.img ?? '');
+        TextEditingController(text: data.qty?.toString() ?? '');
+    
     prodUnitPriceController =
-        TextEditingController(text: widget.unitPrice?.toString() ?? '');
+        TextEditingController(text: data.unitPrice?.toString() ?? '');
     prodTotalPriceController =
-        TextEditingController(text: widget.totalPrice?.toString() ?? '');
+        TextEditingController(text: data.totalPrice?.toString() ?? '');
     UpdatedProduct();
   }
 
@@ -95,7 +95,7 @@ class _ProductUpdateScreenState extends State<ProductUpdateScreen> {
           iconSize: 35,
           color: colorGrey,
           onPressed: () {
-            Navigator.pop(context);
+             Navigator.popAndPushNamed(context, '/homeScreen');
           },
         ),
       ),
@@ -109,8 +109,7 @@ class _ProductUpdateScreenState extends State<ProductUpdateScreen> {
             ProductTextField(
               controller: prodImageController,
               labelText: 'Product Image',
-
-              ),
+            ),
             const SizedBox(
               height: 15,
             ),
@@ -182,5 +181,3 @@ class _ProductUpdateScreenState extends State<ProductUpdateScreen> {
     );
   }
 }
-
-

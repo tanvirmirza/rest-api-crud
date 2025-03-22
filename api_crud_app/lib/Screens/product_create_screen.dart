@@ -83,7 +83,7 @@ class _ProductCreateScreenState extends State<ProductCreateScreen> {
           iconSize: 35,
           color: colorGrey,
           onPressed: () {
-            Navigator.pop(context);
+             Navigator.popAndPushNamed(context, '/homeScreen');
           },
         ),
       ),
@@ -184,6 +184,7 @@ class _ProductCreateScreenState extends State<ProductCreateScreen> {
                     );
                     Navigator.pop(context, true);
                     setState(() {});
+                    
                   },
                   buttonText: 'Create',
                 ))

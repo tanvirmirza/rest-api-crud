@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import '../Style/style.dart';
 import '../Widgets/app_button.dart';
-import 'product_create_screen.dart';
 import 'product_details_screen.dart';
 import 'product_update_screen.dart';
 
@@ -55,6 +54,7 @@ class _ProductHomeScreenState extends State<ProductHomeScreen> {
         forceMaterialTransparency: false,
         elevation: 0,
         centerTitle: false,
+    
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -63,6 +63,7 @@ class _ProductHomeScreenState extends State<ProductHomeScreen> {
           color: appPrimaryForeground,
           width: 90,
         ),
+
             Text(
               'TechMart',
               style: GoogleFonts.baumans(
@@ -76,7 +77,9 @@ class _ProductHomeScreenState extends State<ProductHomeScreen> {
           IconButton(
             icon: shopCart,
             color: appPrimaryForeground,
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, '/cartScreen');
+            },
           ),
           IconButton(
             icon: const Icon(Icons.notifications_none_rounded),
@@ -96,11 +99,8 @@ class _ProductHomeScreenState extends State<ProductHomeScreen> {
               ? null
               : FloatingActionButton(
                   onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                const ProductCreateScreen())).then((value) {
+                    Navigator.pushReplacementNamed(
+                        context, '/createScreen').then((value) {
                       if (value == true) fetchData();
                     });
                   },
@@ -170,32 +170,22 @@ class _ProductHomeScreenState extends State<ProductHomeScreen> {
                       itemBuilder: (context, index) {
                         var product = productController.products[index];
                         return ProductCard(
-                          pImgSrc: product.img.toString(),
-                          pName: product.productName.toString(),
-                          price: product.unitPrice,
+                          data: product,
                           onTap: () {
-                            Navigator.push(
+                            Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => ProductDetailsScreen(
-                                          netImg: product.img.toString(),
-                                          prodName:
-                                              product.productName.toString(),
-                                          prodPrice: product.unitPrice,
-                                          prodQty: product.qty,
+                                      data: product,
+                                       
                                         )));
                           },
                           onEdit: () {
-                            Navigator.push(
+                            Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => ProductUpdateScreen(
-                                  id: product.sId.toString(),
-                                  name: product.productName.toString(),
-                                  qty: product.qty,
-                                  img: product.img.toString(),
-                                  unitPrice: product.unitPrice?.toInt(),
-                                  totalPrice: product.totalPrice?.toInt(),
+                                  data: product,
                                 ),
                               ),
                             ).then((value) {
