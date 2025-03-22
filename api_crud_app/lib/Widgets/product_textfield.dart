@@ -10,8 +10,8 @@ class ProductTextField extends StatelessWidget {
     super.key,
     required this.controller,
     required this.labelText,
-    this.keyboardType  = TextInputType.text,
-    this.textInputAction  = TextInputAction.next,
+    this.keyboardType = TextInputType.text,
+    this.textInputAction = TextInputAction.next,
   });
 
   @override

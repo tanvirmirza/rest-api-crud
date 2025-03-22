@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../RestAPI/product_model.dart';
+import '../Model/product_model.dart';
 import '../Style/style.dart';
+import 'package:intl/intl.dart';
+
 
 class ProductCard extends StatelessWidget {
   final Data data;
@@ -9,8 +11,7 @@ class ProductCard extends StatelessWidget {
   final VoidCallback onEdit;
   final VoidCallback onDelete;
   const ProductCard(
-      {
-      required this.data,
+      {required this.data,
       required this.onTap,
       required this.onEdit,
       required this.onDelete,
@@ -62,10 +63,10 @@ class ProductCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            '৳${data.unitPrice.toString()}',
+                            '৳${NumberFormat.decimalPattern().format(data.unitPrice)}',
                             style: GoogleFonts.lexend(
                                 fontSize: 18,
-                                color: bodyText,
+                                color: colorDarkBlue,
                                 fontWeight: FontWeight.bold),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,

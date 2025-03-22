@@ -7,6 +7,9 @@ const colorWhite = Color.fromRGBO(255, 255, 255, 1);
 const colorDarkBlue = Color.fromRGBO(44, 62, 80, 1);
 const colorGrey = Color.fromRGBO(117, 117, 117, 1);
 
+const shimmerBase = Color.fromRGBO(224, 224, 224, 1);
+const shimmerHighlight = Color.fromRGBO(245, 245, 245, 1);
+
 const bodyBackground = Color.fromRGBO(240, 240, 240, 1);
 const bodyText = Color.fromRGBO(97, 97, 97, 1);
 
@@ -52,7 +55,7 @@ InputDecoration appInputDecoration({label}) {
 
 BoxDecoration bannerImageDecoration() {
   return BoxDecoration(
-    color: Colors.white,
+    color: colorWhite,
     boxShadow: [
       BoxShadow(
         color: Colors.grey.withOpacity(0.5),
@@ -93,26 +96,26 @@ Widget buildShimmerEffect() {
     child: Column(
       children: [
         Shimmer.fromColors(
-          baseColor: Colors.grey.shade300,
-          highlightColor: Colors.grey.shade100,
+          baseColor: shimmerBase,
+          highlightColor: shimmerHighlight,
           child: Container(
             width: double.infinity,
             height: 50,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: colorWhite,
               borderRadius: BorderRadius.circular(12),
             ),
           ),
         ),
         const SizedBox(height: 8),
         Shimmer.fromColors(
-          baseColor: Colors.grey.shade300,
-          highlightColor: Colors.grey.shade100,
+          baseColor: shimmerBase,
+          highlightColor: shimmerHighlight,
           child: Container(
             width: double.infinity,
             height: 150,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: colorWhite,
               borderRadius: BorderRadius.circular(10),
             ),
           ),
@@ -128,11 +131,11 @@ Widget buildShimmerEffect() {
                 childAspectRatio: 0.8),
             itemBuilder: (context, index) {
               return Shimmer.fromColors(
-                baseColor: Colors.grey.shade300,
-                highlightColor: Colors.grey.shade100,
+                baseColor: shimmerBase,
+                highlightColor: shimmerHighlight,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: colorWhite,
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
@@ -157,6 +160,6 @@ SnackBar bottomSnackBar({label, backgroundColor = colorGreen}) {
       borderRadius: BorderRadius.circular(12),
     ),
     margin: const EdgeInsets.all(16),
-    duration: const Duration(seconds: 3),
+    duration: const Duration(seconds: 2),
   );
 }

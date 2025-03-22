@@ -1,7 +1,16 @@
+import 'package:api_crud_app/Provider/product_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'App.dart';
+import 'Provider/product_cart_provider.dart';
 
-void main() => runApp( MyApp());
+void main() => runApp(MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ProductProvider(),),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+      ],
+      child: MyApp(),
+    ));
 
 
 // This Code for DevicePreview : =>

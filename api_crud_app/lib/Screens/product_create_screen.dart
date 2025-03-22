@@ -1,48 +1,39 @@
-import 'package:api_crud_app/RestAPI/rest_api_client.dart';
-import 'package:api_crud_app/Widgets/app_button.dart';
+import 'package:api_crud_app/Provider/product_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../Style/style.dart';
-import '../Widgets/product_textfield.dart';
+import '../Widgets/app_button.dart';
 import '../Widgets/secondary_button.dart';
+import '../Widgets/product_textfield.dart';
 
 class ProductCreateScreen extends StatefulWidget {
-  final String? id;
-  final String? name;
-  final int? qty;
-  final String? img;
-  final int? unitPrice;
-  final int? totalPrice;
-
-  const ProductCreateScreen(
-      {this.id,
-      this.name,
-      this.qty,
-      this.img,
-      this.unitPrice,
-      this.totalPrice,
-      super.key});
+  const ProductCreateScreen({super.key});
 
   @override
   State<ProductCreateScreen> createState() => _ProductCreateScreenState();
 }
 
 class _ProductCreateScreenState extends State<ProductCreateScreen> {
-  ProductController productController = ProductController();
+  final TextEditingController prodImageController = TextEditingController();
+  final TextEditingController prodNameController = TextEditingController();
 
-  TextEditingController prodNameController = TextEditingController();
-  TextEditingController prodQuantityController = TextEditingController();
-  TextEditingController prodImageController = TextEditingController();
-  TextEditingController prodUnitPriceController = TextEditingController();
-  TextEditingController prodTotalPriceController = TextEditingController();
+  final TextEditingController prodQuantityController = TextEditingController();
 
-  Future<void> createdProduct() async {
-    await productController.fetchProducts();
-    try {
-      if (prodNameController.text.isNotEmpty &&
-          prodImageController.text.isNotEmpty &&
-          int.tryParse(prodQuantityController.text) != null &&
-          int.tryParse(prodUnitPriceController.text) != null &&
-          int.tryParse(prodTotalPriceController.text) != null) {
+  final TextEditingController prodUnitPriceController = TextEditingController();
+
+  final TextEditingController prodTotalPriceController =
+      TextEditingController();
+
+  Future<void> createdProduct(BuildContext context) async {
+    final productController =
+        Provider.of<ProductProvider>(context, listen: false);
+
+    if (prodNameController.text.isNotEmpty &&
+        prodImageController.text.isNotEmpty &&
+        int.tryParse(prodQuantityController.text) != null &&
+        int.tryParse(prodUnitPriceController.text) != null &&
+        int.tryParse(prodTotalPriceController.text) != null) {
+      try {
         await productController.createProduct(
           prodNameController.text,
           prodImageController.text,
@@ -50,23 +41,21 @@ class _ProductCreateScreenState extends State<ProductCreateScreen> {
           int.parse(prodUnitPriceController.text),
           int.parse(prodTotalPriceController.text),
         );
+        ScaffoldMessenger.of(context).showSnackBar(
+          bottomSnackBar(label: 'Sucessfully Created Product!'),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(bottomSnackBar(
+            label: 'Failed to create product!', backgroundColor: colorRed));
       }
-    } catch (e) {
-      throw Exception('An error occurred while processing the data!');
     }
   }
 
   @override
-  void initState() {
-    createdProduct();
-    super.initState();
-  }
-
-  @override
   void dispose() {
+    prodImageController.dispose();
     prodNameController.dispose();
     prodQuantityController.dispose();
-    prodImageController.dispose();
     prodUnitPriceController.dispose();
     prodTotalPriceController.dispose();
     super.dispose();
@@ -83,7 +72,7 @@ class _ProductCreateScreenState extends State<ProductCreateScreen> {
           iconSize: 35,
           color: colorGrey,
           onPressed: () {
-             Navigator.popAndPushNamed(context, '/homeScreen');
+            Navigator.pushReplacementNamed(context, '/homeScreen');
           },
         ),
       ),
@@ -91,105 +80,66 @@ class _ProductCreateScreenState extends State<ProductCreateScreen> {
         padding: const EdgeInsets.all(15.0),
         child: ListView(
           children: [
-            const SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 20),
             ProductTextField(
-              controller: prodImageController,
-              labelText: 'Product Image',
-            ),
-            const SizedBox(
-              height: 15,
-            ),
+                controller: prodImageController, labelText: 'Product Image'),
+            const SizedBox(height: 15),
             ProductTextField(
-              controller: prodNameController,
-              labelText: 'Product Name',
-            ),
-            const SizedBox(
-              height: 15,
-            ),
+                controller: prodNameController, labelText: 'Product Name'),
+            const SizedBox(height: 15),
             DropdownButtonFormField(
-              
               value: prodQuantityController.text,
               decoration: appInputDecoration(),
-              items:  const [
+              items: const [
                 DropdownMenuItem(
-                  value: '',
-                  child: Text('Product Quantity', style: textStyle,),
-                ),
-                DropdownMenuItem(
-                  value: '1',
-                  child: Text('1 pcs'),
-                ),
-                DropdownMenuItem(
-                  value: '2',
-                  child: Text('2 pcs'),
-                ),
-                DropdownMenuItem(
-                  value: '3',
-                  child: Text('3 pcs'),
-                ),
-                DropdownMenuItem(
-                  value: '4',
-                  child: Text('4 pcs'),
-                ),
+                    value: '',
+                    child: Text('Product Quantity', style: textStyle)),
+                DropdownMenuItem(value: '1', child: Text('1 pcs')),
+                DropdownMenuItem(value: '2', child: Text('2 pcs')),
+                DropdownMenuItem(value: '3', child: Text('3 pcs')),
+                DropdownMenuItem(value: '4', child: Text('4 pcs')),
               ],
               onChanged: (value) {
-                setState(() {
-                  prodQuantityController.text = value.toString();
-                });
+                prodQuantityController.text = value.toString();
               },
             ),
-            const SizedBox(
-              height: 15,
-            ),
+            const SizedBox(height: 15),
             ProductTextField(
-             
               controller: prodUnitPriceController,
-               keyboardType: TextInputType.number,
-               labelText: 'Product Unit Price',
+              keyboardType: TextInputType.number,
+              labelText: 'Product Unit Price',
             ),
-            const SizedBox(
-              height: 15,
-            ),
+            const SizedBox(height: 15),
             ProductTextField(
               textInputAction: TextInputAction.done,
               keyboardType: TextInputType.number,
               controller: prodTotalPriceController,
-              labelText: 'Product Total Price'
+              labelText: 'Product Total Price',
             ),
-            const SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
                   child: AppSecondaryButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      buttonText: 'Cencel'),
+                    onPressed: () {
+                      Navigator.pushReplacementNamed(context, '/homeScreen');
+                    },
+                    buttonText: 'Cancel',
+                  ),
                 ),
-                const SizedBox(
-                  width: 10,
-                ),
+                const SizedBox(width: 10),
                 Expanded(
-                    child: AppButton(
-                  onPressed: () async {
-                    await createdProduct();
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      bottomSnackBar(label: 'Sucessfully Created Product!'),
-                    );
-                    Navigator.pop(context, true);
-                    setState(() {});
-                    
-                  },
-                  buttonText: 'Create',
-                ))
+                  child: AppButton(
+                    onPressed: () async {
+                      await createdProduct(context);
+                      Navigator.pushReplacementNamed(context, '/homeScreen');
+                    },
+                    buttonText: 'Create',
+                  ),
+                ),
               ],
-            )
+            ),
           ],
         ),
       ),

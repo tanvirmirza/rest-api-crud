@@ -14,10 +14,12 @@ dependencies:
 
   cupertino_icons: ^1.0.6
   http: ^1.2.2
+  provider: ^6.1.2
   device_preview: ^1.1.0
   shimmer: ^2.0.0
-  flutter_svg: ^2.0.10+1
+  fluttertoast: ^8.2.8
   google_fonts: ^6.2.1
+  intl: ^0.18.1
   
 
 dev_dependencies:

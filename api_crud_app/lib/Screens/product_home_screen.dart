@@ -1,8 +1,9 @@
-import 'package:api_crud_app/RestAPI/rest_api_client.dart';
+import 'package:api_crud_app/Provider/product_provider.dart';
 import 'package:api_crud_app/Widgets/product_card.dart';
 import 'package:api_crud_app/Widgets/secondary_button.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../Style/style.dart';
 import '../Widgets/app_button.dart';
 import 'product_details_screen.dart';
@@ -16,27 +17,9 @@ class ProductHomeScreen extends StatefulWidget {
 }
 
 class _ProductHomeScreenState extends State<ProductHomeScreen> {
-  ProductController productController = ProductController();
-  bool isLoading = true;
-  bool hasError = false;
-
   Future<void> fetchData() async {
-    setState(() {
-      isLoading = true;
-      hasError = false;
-    });
-
-    try {
-      await productController.fetchProducts();
-      setState(() {
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        hasError = true;
-        isLoading = false;
-      });
-    }
+    final provider = Provider.of<ProductProvider>(context, listen: false);
+    await provider.fetchProducts();
   }
 
   @override
@@ -47,71 +30,74 @@ class _ProductHomeScreenState extends State<ProductHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: bodyBackground,
-      appBar: AppBar(
-        backgroundColor: appPrimaryBackground,
-        forceMaterialTransparency: false,
-        elevation: 0,
-        centerTitle: false,
-    
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Image.asset(
-          'assets/images/tech_mart.png',
-          color: appPrimaryForeground,
-          width: 90,
-        ),
-
-            Text(
-              'TechMart',
-              style: GoogleFonts.baumans(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
-                  color: appPrimaryForeground),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: shopCart,
-            color: appPrimaryForeground,
-            onPressed: () {
-              Navigator.pushReplacementNamed(context, '/cartScreen');
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.notifications_none_rounded),
-            color: appPrimaryForeground,
-            onPressed: () {},
-          )
-        ],
-      ),
-      body: isLoading
-          ? buildShimmerEffect()
-          : hasError
-              ? buildErrorWidget()
-              : buildProductView(),
-      floatingActionButton: isLoading
-          ? null
-          : hasError
-              ? null
-              : FloatingActionButton(
-                  onPressed: () {
-                    Navigator.pushReplacementNamed(
-                        context, '/createScreen').then((value) {
-                      if (value == true) fetchData();
-                    });
-                  },
-                  foregroundColor: appPrimaryForeground,
-                  backgroundColor: appPrimaryBackground,
-                  child: const Icon(Icons.add),
+    return Consumer<ProductProvider>(
+        builder: (context, productProvider, child) {
+      return Scaffold(
+          backgroundColor: bodyBackground,
+          appBar: AppBar(
+            backgroundColor: appPrimaryBackground,
+            forceMaterialTransparency: false,
+            elevation: 0,
+            centerTitle: false,
+            automaticallyImplyLeading: false,
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Image.asset(
+                  'assets/images/tech_mart.png',
+                  color: appPrimaryForeground,
+                  width: 90,
                 ),
-    );
+                Text(
+                  'TechMart',
+                  style: GoogleFonts.baumans(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      color: appPrimaryForeground),
+                ),
+              ],
+            ),
+            actions: [
+              IconButton(
+                icon: shopCart,
+                color: appPrimaryForeground,
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, '/cartScreen');
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.notifications_none_rounded),
+                color: appPrimaryForeground,
+                onPressed: () {},
+              )
+            ],
+          ),
+          body: (productProvider.isLoading)
+              ? buildShimmerEffect()
+              : (productProvider.hasError)
+                  ? buildErrorWidget(productProvider)
+                  : buildProductView(productProvider),
+          floatingActionButton: (productProvider.isLoading)
+              ? null
+              : (productProvider.hasError)
+                  ? null
+                  : FloatingActionButton(
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, '/createScreen')
+                            .then((value) {
+                          if (value == true) {
+                            fetchData();
+                          }
+                        });
+                      },
+                      foregroundColor: appPrimaryForeground,
+                      backgroundColor: appPrimaryBackground,
+                      child: const Icon(Icons.add),
+                    ));
+    });
   }
 
-  Widget buildProductView() {
+  Widget buildProductView(ProductProvider productProvider) {
     return RefreshIndicator(
       onRefresh: () async {
         await fetchData();
@@ -165,10 +151,10 @@ class _ProductHomeScreenState extends State<ProductHomeScreen> {
                     GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: productController.products.length,
+                      itemCount: productProvider.products.length,
                       gridDelegate: productGridViewStyle(),
                       itemBuilder: (context, index) {
-                        var product = productController.products[index];
+                        var product = productProvider.products[index];
                         return ProductCard(
                           data: product,
                           onTap: () {
@@ -176,8 +162,8 @@ class _ProductHomeScreenState extends State<ProductHomeScreen> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => ProductDetailsScreen(
-                                      data: product,
-                                       
+                                          product: product,
+                                          index: index,
                                         )));
                           },
                           onEdit: () {
@@ -195,8 +181,8 @@ class _ProductHomeScreenState extends State<ProductHomeScreen> {
                           onDelete: () {
                             showDialog(
                                 context: context,
-                                builder: (context) =>
-                                    deleteDialog(product, context));
+                                builder: (context) => deleteDialog(
+                                    product, context, productProvider));
                           },
                         );
                       },
@@ -211,33 +197,28 @@ class _ProductHomeScreenState extends State<ProductHomeScreen> {
     );
   }
 
-  Widget deleteDialog(product, BuildContext context) {
+  Widget deleteDialog(
+      product, BuildContext context, ProductProvider productProvider) {
     return AlertDialog(
       title: const Text('Warning!'),
       content: const Text('Are you sure want to delete?'),
       actions: [
         AppButton(
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.pop(context);
           },
           buttonText: 'No',
         ),
         AppSecondaryButton(
           onPressed: () {
-            productController
-                .deleteProducts(product.sId.toString())
-                .then((value) {
-              if (value) {
-                setState(() {
-                  fetchData();
-                });
-              }
-            });
+            productProvider.deleteProduct(product.sId.toString());
+
             ScaffoldMessenger.of(context).showSnackBar(
               bottomSnackBar(
-                  label: 'Product deleted!', backgroundColor: colorRed),
+                  label: 'Product has been deleted!',
+                  backgroundColor: colorRed),
             );
-            Navigator.of(context).pop();
+            Navigator.pop(context);
           },
           buttonText: "Yes",
         ),
@@ -245,7 +226,7 @@ class _ProductHomeScreenState extends State<ProductHomeScreen> {
     );
   }
 
-  Widget buildErrorWidget() {
+  Widget buildErrorWidget(ProductProvider productProvider) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -256,9 +237,6 @@ class _ProductHomeScreenState extends State<ProductHomeScreen> {
           const SizedBox(height: 10),
           AppButton(
               onPressed: () async {
-                setState(() {
-                  isLoading = true;
-                });
                 await Future.delayed(const Duration(seconds: 3));
                 await fetchData();
               },

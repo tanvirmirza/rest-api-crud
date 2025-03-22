@@ -1,15 +1,12 @@
 import 'package:api_crud_app/Style/style.dart';
 import 'package:flutter/material.dart';
-import 'RestAPI/rest_api_client.dart';
 import 'Screens/product_cart_screen.dart';
 import 'Screens/product_create_screen.dart';
 import 'Screens/product_home_screen.dart';
 import 'Screens/splash_screen.dart';
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});
-
-  final ProductController productController = ProductController();
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +17,8 @@ class MyApp extends StatelessWidget {
           '/splash': (context) => const SplashScreen(),
           '/homeScreen': (context) => const ProductHomeScreen(),
           '/createScreen': (context) => const ProductCreateScreen(),
-          '/cartScreen' :(context) => const ProductCart()
+          '/cartScreen': (context) => const ProductCart()
         },
-        
         title: "CRUD API PROJECT",
         theme: ThemeData(
           primaryColor: appPrimaryBackground,
