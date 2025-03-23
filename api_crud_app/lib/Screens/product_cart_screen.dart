@@ -6,7 +6,6 @@ import '../Style/style.dart';
 import '../Widgets/product_cart_tile.dart';
 import 'package:intl/intl.dart';
 
-
 class ProductCart extends StatelessWidget {
   const ProductCart({super.key});
 
@@ -42,8 +41,14 @@ class ProductCart extends StatelessWidget {
                             return ProductCartTile(
                                 data: product,
                                 icon: const Icon(Icons.delete_forever_rounded),
-                                onPressed: () =>
-                                    cartProvider.removeFromCart(product.sId!));
+                                onPressed: () {
+                                   cartProvider.removeFromCart(product.sId!);
+                                   ScaffoldMessenger.of(context).showSnackBar(
+                                    bottomSnackBar(
+                                        label:
+                                            'Cart Product has been deleted!',
+                                        backgroundColor: colorRed));
+                                });
                           },
                         ),
                       ),
@@ -51,7 +56,8 @@ class ProductCart extends StatelessWidget {
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
                           children: [
-                            Text("Total: \$${NumberFormat.decimalPattern().format(cartProvider.totalAmount)}",
+                            Text(
+                                "Total: ৳${NumberFormat.decimalPattern().format(cartProvider.totalAmount)}",
                                 style: const TextStyle(
                                     fontSize: 18, fontWeight: FontWeight.bold)),
                             AppButton(

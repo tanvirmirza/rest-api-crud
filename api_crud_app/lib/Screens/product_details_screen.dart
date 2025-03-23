@@ -198,7 +198,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             color: colorRed),
                       ),
                     const SizedBox(
-                      height: 20,
+                      height: 15,
                     ),
                     if (product.qty == 0)
                     const SizedBox(height: 0,)
@@ -237,6 +237,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 15,),
                     Text(
                       'Description',
                       style: GoogleFonts.poppins(
